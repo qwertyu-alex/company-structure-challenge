@@ -1,8 +1,11 @@
+![Video 1 (1)](https://github.com/thebestclicker/company-structure-challenge/assets/10188306/ea67a93a-1963-49e0-b8ef-50819bc841ac)
+
 <p align="center">
   <br/>
-  <h1 >Company Structure</h1> 
+  <p >Company Structure</p> 
   <br/>
 </p>
+
 
 ## About
 
