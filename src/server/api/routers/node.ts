@@ -129,11 +129,34 @@ export const nodeRouter = createTRPCRouter({
       const dbRes = await ctx.db.$transaction(async (db) => {
         const node = await db.node.findUniqueOrThrow({
           where: { id: input.id },
+          include: { parent: { include: { children: true } } },
         });
 
-        const parent = await db.node.findUniqueOrThrow({
+        const newParent = await db.node.findUniqueOrThrow({
           where: { id: input.newParentId },
         });
+
+        const oldParent = node.parent;
+
+        if (!oldParent) {
+          throw new Error("Cannot move root node");
+        }
+
+        // If the old parent node has no other children, set its preferredProgrammingLanguage, and eventually demote
+        if (oldParent.children.length === 1) {
+          await db.node.update({
+            where: { id: oldParent.id },
+            data: {
+              managingDepartment: oldParent.parentId
+                ? undefined
+                : oldParent.managingDepartment,
+              preferredProgrammingLanguage:
+                oldParent.preferredProgrammingLanguage ??
+                generateProgrammingLanguage(),
+            },
+          });
+        }
+
         const updatedNode = await db.node.update({
           where: { id: input.id },
           include: { children: true },
@@ -143,7 +166,7 @@ export const nodeRouter = createTRPCRouter({
                 id: input.newParentId,
               },
             },
-            height: parent.height + 1,
+            height: newParent.height + 1,
           },
         });
 
@@ -166,9 +189,49 @@ export const nodeRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const node = await ctx.db.node.findUniqueOrThrow({
         where: { id: input.id },
+        include: { children: true, parent: { include: { children: true } } },
       });
 
+      const parent = node.parent;
+
+      if (!parent) {
+        throw new Error("Cannot detach root node");
+      }
+
       const dbRes = await ctx.db.$transaction(async (db) => {
+        if (node.children.length === 0) {
+          return db.node.update({
+            where: { id: input.id },
+            include: { children: true },
+            data: {
+              parent: {
+                disconnect: true,
+              },
+              height: 0,
+              managingDepartment:
+                node.managingDepartment ?? generateDepartmentName(),
+              preferredProgrammingLanguage:
+                node.preferredProgrammingLanguage ??
+                generateProgrammingLanguage(),
+            },
+          });
+        }
+
+        // If the parent node has no other children, set its preferredProgrammingLanguage
+        if (parent.children.length === 1) {
+          await db.node.update({
+            where: { id: parent.id },
+            data: {
+              managingDepartment: parent.parentId
+                ? undefined
+                : parent.managingDepartment,
+              preferredProgrammingLanguage:
+                parent.preferredProgrammingLanguage ??
+                generateProgrammingLanguage(),
+            },
+          });
+        }
+
         const updatedNode = await db.node.update({
           where: { id: input.id },
           include: { children: true },
@@ -177,6 +240,8 @@ export const nodeRouter = createTRPCRouter({
               disconnect: true,
             },
             height: 0,
+            managingDepartment:
+              node.managingDepartment ?? generateDepartmentName(),
           },
         });
 
@@ -195,9 +260,28 @@ export const nodeRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const node = await ctx.db.node.findUniqueOrThrow({
         where: { id: input.id },
+        include: { parent: { include: { children: true } } },
       });
 
+      const parent = node.parent;
+
       const dbRes = await ctx.db.$transaction(async (db) => {
+        // If the parent node has no other children demote
+        if (parent && parent.children.length === 1) {
+          await db.node.update({
+            where: { id: parent.id },
+            data: {
+              managingDepartment: parent.parentId
+                ? undefined
+                : parent.managingDepartment,
+
+              preferredProgrammingLanguage:
+                parent.preferredProgrammingLanguage ??
+                generateProgrammingLanguage(),
+            },
+          });
+        }
+
         const deletedNode = await db.node.delete({
           where: { id: input.id },
           include: { children: true },
