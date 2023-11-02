@@ -73,6 +73,8 @@ type Developer extends Node = {
 
 ### Assumptions
 
+If root-node is the only node in the tree, it is both a manager and a developer
+
 Managers are nodes with any number of child larger than 0.
 
 Developers are nodes with no children.

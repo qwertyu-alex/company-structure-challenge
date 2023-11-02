@@ -9,7 +9,7 @@ export function CreatePost() {
   const router = useRouter();
   const [name, setName] = useState("");
 
-  const createPost = api.post.create.useMutation({
+  const createPost = api.node.create.useMutation({
     onSuccess: () => {
       router.refresh();
       setName("");

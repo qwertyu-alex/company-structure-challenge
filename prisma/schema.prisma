@@ -10,9 +10,16 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
+model Node {
+    id                           String  @id @default(uuid())
+    name                         String
+    parentId                     String?
+    parent                       Node?   @relation("ManagerDeveloper", fields: [parentId], references: [id])
+    children                     Node[]  @relation("ManagerDeveloper")
+    height                       Int
+    managingDepartment           String?
+    preferredProgrammingLanguage String?
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
