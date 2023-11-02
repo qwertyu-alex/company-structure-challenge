@@ -6,7 +6,6 @@
   <br/>
 </p>
 
-
 ## About
 
 This is a project created to solve a Full Stack Code Challenge.
@@ -31,6 +30,9 @@ pnpm install
 pnpm build
 pnpm start
 ```
+
+Go to [http://localhost:3000](http://localhost:3000) for webapp.
+Go to [http://localhost:3000/api/panel](http://localhost:3000/api/panel) for api panel (swagger like).
 
 ## Create T3 App
 
