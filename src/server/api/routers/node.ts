@@ -70,27 +70,42 @@ const deleteRecursive = async (input: {
 export const nodeRouter = createTRPCRouter({
   create: publicProcedure
     .input(
-      z.object({ name: z.string().min(1), parentId: z.string().optional() }),
+      z.object({ name: z.string().min(1), parentId: z.string().nullish() }),
     )
     .mutation(async ({ ctx, input }) => {
-      if (input.parentId) {
+      const parentId = input.parentId;
+      if (parentId) {
         // Non-root node
         const parent = await ctx.db.node.findUniqueOrThrow({
-          where: { id: input.parentId },
+          where: { id: parentId },
         });
 
-        return ctx.db.node.create({
-          data: {
-            name: input.name,
-            height: parent.height + 1,
-            managingDepartment: generateDepartmentName(),
-            parent: {
-              connect: {
-                id: input.parentId,
+        const dbRes = await ctx.db.$transaction(async (db) => {
+          // Promote parent node
+          await db.node.update({
+            where: { id: parent.id },
+            data: {
+              preferredProgrammingLanguage: null,
+              managingDepartment:
+                parent.managingDepartment ?? generateDepartmentName(),
+            },
+          });
+
+          return db.node.create({
+            data: {
+              name: input.name,
+              height: parent.height + 1,
+              preferredProgrammingLanguage: generateProgrammingLanguage(),
+              parent: {
+                connect: {
+                  id: parentId,
+                },
               },
             },
-          },
+          });
         });
+
+        return dbRes;
       } else {
         // root node
         return ctx.db.node.create({
@@ -105,7 +120,7 @@ export const nodeRouter = createTRPCRouter({
     }),
 
   get: publicProcedure
-    .input(z.object({ id: z.string().optional() }))
+    .input(z.object({ id: z.string().nullish() }))
     .query<Node[]>(async ({ ctx, input }) => {
       if (input.id) {
         const dbRes = await ctx.db.node.findUniqueOrThrow({
@@ -138,25 +153,22 @@ export const nodeRouter = createTRPCRouter({
 
         const oldParent = node.parent;
 
-        if (!oldParent) {
-          throw new Error("Cannot move root node");
+        if (oldParent) {
+          // If the old parent node has no other children, set its preferredProgrammingLanguage, and eventually demote
+          if (oldParent.children.length === 1) {
+            await db.node.update({
+              where: { id: oldParent.id },
+              data: {
+                managingDepartment: oldParent.parentId
+                  ? null
+                  : oldParent.managingDepartment,
+                preferredProgrammingLanguage:
+                  oldParent.preferredProgrammingLanguage ??
+                  generateProgrammingLanguage(),
+              },
+            });
+          }
         }
-
-        // If the old parent node has no other children, set its preferredProgrammingLanguage, and eventually demote
-        if (oldParent.children.length === 1) {
-          await db.node.update({
-            where: { id: oldParent.id },
-            data: {
-              managingDepartment: oldParent.parentId
-                ? undefined
-                : oldParent.managingDepartment,
-              preferredProgrammingLanguage:
-                oldParent.preferredProgrammingLanguage ??
-                generateProgrammingLanguage(),
-            },
-          });
-        }
-
         const updatedNode = await db.node.update({
           where: { id: input.id },
           include: { children: true },
@@ -167,6 +179,7 @@ export const nodeRouter = createTRPCRouter({
               },
             },
             height: newParent.height + 1,
+            managingDepartment: null,
           },
         });
 
@@ -223,7 +236,7 @@ export const nodeRouter = createTRPCRouter({
             where: { id: parent.id },
             data: {
               managingDepartment: parent.parentId
-                ? undefined
+                ? null
                 : parent.managingDepartment,
               preferredProgrammingLanguage:
                 parent.preferredProgrammingLanguage ??
@@ -272,7 +285,7 @@ export const nodeRouter = createTRPCRouter({
             where: { id: parent.id },
             data: {
               managingDepartment: parent.parentId
-                ? undefined
+                ? null
                 : parent.managingDepartment,
 
               preferredProgrammingLanguage:
