@@ -1,5 +1,7 @@
 ![Video 1 (1)](https://github.com/thebestclicker/company-structure-challenge/assets/10188306/ea67a93a-1963-49e0-b8ef-50819bc841ac)
 
+![fasf](https://github.com/thebestclicker/company-structure-challenge/assets/10188306/73a4cf7a-0380-4ae0-addc-75c859feac32)
+
 <p align="center">
   <br/>
   <p >Company Structure</p> 
