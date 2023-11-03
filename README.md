@@ -4,7 +4,7 @@
 
 <p align="center">
   <br/>
-  <p >Company Structure</p> 
+  <a href="https://company-structure-challenge.vercel.app/">company-structure-challenge.vercel.app</a> 
   <br/>
 </p>
 
