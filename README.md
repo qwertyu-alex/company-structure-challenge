@@ -18,6 +18,17 @@ Requirements:
 
 - Either `npm` or `pnpm` installed
 
+If you want to run locally, then go into ./prisma/schema.prisma and change the datasource db to the following:
+```prisma
+datasource db {
+    provider = "sqlite"
+    url      = "file:./db.sqlite"
+}
+```
+
+Then continue with the following: 
+
+#### For dev
 Run the following commands to run on dev:
 
 ```sh
@@ -25,6 +36,7 @@ pnpm install
 pnpm dev
 ```
 
+#### For production
 Run the following commands to run in production:
 
 ```sh
