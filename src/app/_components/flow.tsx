@@ -43,9 +43,9 @@ const convertDBNodeToReactFlowNode = (
     return { initialNodes: [], initialEdges: [] };
   }
 
-  let mapCounter = new Map<number, number>();
-  let xPos = 500;
-  let yPos = 400;
+  const mapCounter = new Map<number, number>();
+  const xPos = 500;
+  const yPos = 400;
 
   const reactFlowNodes: ReactFlowNode<NodeData>[] = nodes.map((node) => {
     mapCounter.set(node.height, (mapCounter.get(node.height) ?? 0) + 1);
@@ -123,17 +123,18 @@ const AddNodeOnEdgeDrop = () => {
         deleteMutation
           .mutateAsync({ id: node.id })
           .then(() => {
-            utils.invalidate();
+            void utils.invalidate();
           })
           .catch((err) => {
-            if (err.message === "No Node found") return;
+            if (err instanceof Error)
+              if (err.message === "No Node found") return;
           });
       }
     }
   }, []);
 
   const onEdgeClick = useCallback<
-    (event: React.MouseEvent<Element, MouseEvent>, node: Edge<any>) => void
+    (event: React.MouseEvent<Element, MouseEvent>, node: Edge) => void
   >((event, edge) => {
     console.log("Deleting");
 
@@ -147,10 +148,10 @@ const AddNodeOnEdgeDrop = () => {
       .mutateAsync({ id: target })
       .then(() => {
         setEdges((eds) => eds.filter((e) => e.id !== edge.id));
-        utils.node.get.invalidate();
+        void utils.node.get.invalidate();
       })
       .catch((err) => {
-        if (err.message === "No Edge found") return;
+        if (err instanceof Error) if (err.message === "No Edge found") return;
       });
   }, []);
 
@@ -176,13 +177,13 @@ const AddNodeOnEdgeDrop = () => {
 
     setEdges((eds) => addEdge(newEdge, eds));
 
-    moveMutation
+    void moveMutation
       .mutateAsync({
         id: params.target,
         newParentId: params.source,
       })
       .then(() => {
-        utils.node.get.invalidate();
+        void utils.node.get.invalidate();
       });
   }, []);
 

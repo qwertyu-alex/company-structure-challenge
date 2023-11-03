@@ -30,7 +30,9 @@ const config = {
         checksVoidReturn: { attributes: false },
       },
     ],
+    "@typescript-eslint/require-await": "off",
+    "@typescript-eslint/no-empty-interface": "off",
   },
-};
+}
 
-module.exports = config;
+module.exports = config

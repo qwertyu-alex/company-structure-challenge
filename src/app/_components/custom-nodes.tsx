@@ -117,10 +117,10 @@ const FormNodeRaw = (props: NodeProps<NodeData>) => {
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     console.log(values, props.data);
-    mutation
+    void mutation
       .mutateAsync({ name: values.name, parentId: props.data.parentId })
       .then((data) => {
-        utils.node.get.invalidate();
+        void utils.node.get.invalidate();
       });
   };
 

@@ -5,8 +5,8 @@ import {
   generateDepartmentName,
   generateProgrammingLanguage,
 } from "@/lib/utils";
-import { Node, PrismaClient } from "@prisma/client";
-import * as runtime from "@prisma/client/runtime/library";
+import type { Node, PrismaClient } from "@prisma/client";
+import type * as runtime from "@prisma/client/runtime/library";
 
 // TODO: Refactor to use a single recursive query
 /**
