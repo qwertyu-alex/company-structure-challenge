@@ -2,6 +2,8 @@
 
 ![fasf](https://github.com/thebestclicker/company-structure-challenge/assets/10188306/73a4cf7a-0380-4ae0-addc-75c859feac32)
 
+https://github.com/thebestclicker/company-structure-challenge/assets/10188306/745d6775-7b17-4398-99c5-0bf91414c2b4
+
 <p align="center">
   <br/>
   <a href="https://company-structure-challenge.vercel.app/">company-structure-challenge.vercel.app</a> 
