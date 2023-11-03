@@ -136,8 +136,6 @@ const AddNodeOnEdgeDrop = () => {
   const onEdgeClick = useCallback<
     (event: React.MouseEvent<Element, MouseEvent>, node: Edge) => void
   >((event, edge) => {
-    console.log("Deleting");
-
     const target = nodes.find((n) => n.id === edge.target)?.id;
 
     if (!target) {

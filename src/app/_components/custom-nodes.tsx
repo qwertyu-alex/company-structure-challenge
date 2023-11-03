@@ -38,8 +38,6 @@ const managerIcon = "📊";
 const NodeRaw = (props: NodeProps<NodeData>) => {
   const data = props.data;
 
-  console.log(data.preferredProgrammingLanguage);
-
   return (
     <div
       className={cn(
@@ -116,7 +114,6 @@ const FormNodeRaw = (props: NodeProps<NodeData>) => {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values, props.data);
     void mutation
       .mutateAsync({ name: values.name, parentId: props.data.parentId })
       .then((data) => {

@@ -1,25 +1,25 @@
 "use client";
 
-import { Check, ChevronsUpDown } from "lucide-react";
-import * as React from "react";
+import { Check, ChevronsUpDown } from "lucide-react"
+import * as React from "react"
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-} from "@/components/ui/command";
+} from "@/components/ui/command"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { atomContextNodeID } from "@/lib/atoms";
-import { cn } from "@/lib/utils";
-import { api } from "@/trpc/react";
-import { useAtom } from "jotai";
+} from "@/components/ui/popover"
+import { atomContextNodeID } from "@/lib/atoms"
+import { cn } from "@/lib/utils"
+import { api } from "@/trpc/react"
+import { useAtom } from "jotai"
 
 export const Search = () => {
   const [open, setOpen] = React.useState(false);
@@ -58,24 +58,21 @@ export const Search = () => {
           <CommandInput placeholder="Search for a node..." />
           <CommandEmpty>No framework found.</CommandEmpty>
           <CommandGroup>
-            {data?.map((framework) => (
+            {data?.map((node) => (
               <CommandItem
-                key={framework.id}
-                value={framework.name}
-                onSelect={(currentValue) => {
-                  setContextNode(
-                    currentValue === contextNode ? null : currentValue,
-                  );
-                  setOpen(false);
+                key={node.id}
+                value={node.name}
+                onSelect={() => {
+                  setContextNode(node.id)
                 }}
               >
                 <Check
                   className={cn(
                     "mr-2 h-4 w-4",
-                    contextNode === framework.id ? "opacity-100" : "opacity-0",
+                    contextNode === node.id ? "opacity-100" : "opacity-0",
                   )}
                 />
-                {framework.name}
+                {node.name}
               </CommandItem>
             ))}
           </CommandGroup>
